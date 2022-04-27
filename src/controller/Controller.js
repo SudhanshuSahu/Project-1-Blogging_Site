@@ -8,7 +8,7 @@ const createAuthor = async function (req, res) {
         let data = req.body
         if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
         let checkmail = regex.test(data.email)
-        if(checkmail==false) res.status(400).send("email not valid")
+        if (checkmail == false) res.status(400).send("email not valid")
         let emailidexist = await authorModel.findOne({ email: data.email })
         if (emailidexist) {
             return res.status(400).send({ status: false, msg: "email alredy exist" })
@@ -25,25 +25,24 @@ const createAuthor = async function (req, res) {
 
 
 const createBlog = async function (req, res) {
-    try{
-    let data = req.body
-    if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
-    if(data.hasOwnProperty('ispublished'))
-    {
-        if (data.ispublished == true) {
-            data.publishedAt = Date.now()
+    try {
+        let data = req.body
+        if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
+        if (data.hasOwnProperty('ispublished')) {
+            if (data.ispublished == true) {
+                data.publishedAt = Date.now()
+            }
         }
+        let authorId = data.authorId
+        let checkAuthorId = await authorModel.findOne({ _id: authorId })
+        if (!checkAuthorId) {
+            res.status(400).send({ status: false, msg: "Enter valid Author Id" })
+        }
+        let createBlogData = await blogModel.create(data)
+        res.status(201).send({ status: true, data: createBlogData })
+    } catch (e) {
+        res.status(500).send(e.message)
     }
-    let authorId = data.authorId
-    let checkAuthorId = await authorModel.findOne({ _id: authorId })
-    if (!checkAuthorId) {
-        res.status(400).send({ status: false, msg: "Enter valid Author Id" })
-    }
-    let createBlogData = await blogModel.create(data)
-    res.status(201).send({ status: true, data: createBlogData })
-} catch(e){
-    res.status(500).send(e.message)
-}
 }
 
 const getBlog = async function (req, res) {
@@ -87,7 +86,8 @@ const putBlog = async function (req, res) {
 const checkDeleteStatus = async function (req, res) {
     try {
         let blogId = req.params.blogId
-        let checkBlogId = await blogModel.find({ _id: blogId, isdeleted: false })
+        let checkBlogId = await blogModel.findOne({ _id: blogId })
+        if (checkBlogId.isdeleted == true) return res.status(400).send({ msg: "Document is Already Deleted" })
         if (!checkBlogId) return res.status(404).send({ msg: "Blog Id is not valid" })
 
         let deleted = await blogModel.findOneAndUpdate(
@@ -101,14 +101,16 @@ const checkDeleteStatus = async function (req, res) {
 const DeleteStatus = async function (req, res) {
     try {
         let data = req.query
-        data.isdeleted=false
+        let checkDeletedTrue = await blogModel.findOne(data)
+        if (checkDeletedTrue.isdeleted == true) return res.status(400).send({ msg: "Document is Already Deleted" })
         let deleted = await blogModel.findOneAndUpdate(
             data,
             { $set: { isdeleted: true, deletedAt: Date.now() } },
-            {new:true}
+            { new: true }
         )
-        if(!deleted) return res.status(404).send({msg:"blog not valid"})
-        res.status(200).send(deleted)
+        if (!deleted) return res.status(404).send({ msg: "blog not valid" })
+        res.status(200).send({ msg: deleted })
+
     } catch (e) { res.status(500).send(e.message) }
 }
 
