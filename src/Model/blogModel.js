@@ -1,6 +1,4 @@
 const mongoose = require("mongoose")
-                                 //import author model here
-
  const ObjectId = mongoose.Schema.Types.ObjectId 
  
  const blogSchema = new mongoose.Schema({

@@ -1,6 +1,7 @@
 const authorModel = require("../Model/authorModel");
 
-const createdAuthor= async function (req, res) {
+
+const createAuthor= async function (req, res) {
     let data = req.body
     let emailidexist = await authorModel.findOne({email:email})
     if (emailidexist){
@@ -10,4 +11,4 @@ const createdAuthor= async function (req, res) {
     let author_data = await authorModel.create(data)
     res.send({data:author_data})
 }
-    module.exports.createdAuthor= createdAuthor
+    module.exports.createAuthor= createAuthor

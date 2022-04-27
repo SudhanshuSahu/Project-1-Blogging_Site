@@ -1,4 +1,5 @@
 const blogModel= require("../Model/blogModel");
+const authorModel = require("../Model/authorModel");
 
 const createBlog = async function(req,res){
 try{
@@ -18,4 +19,3 @@ catch(err){
 }                              
 
 module.exports.createBlog = createBlog
-//>>>>>>> f24e1100d6d9aa34bf2b3dbc67be79f4fca65fd7
