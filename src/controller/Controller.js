@@ -92,19 +92,19 @@ const checkDeleteStatus = async function (req, res) {
     } catch (e) { res.status(500).send(e.message) }
 }
 
-// const DeleteStatus = async function (req, res) {
-//     try {
-//         let blogId = req.query.blogId
-//         let checkBlogId = await blogModel.find({ _id: blogId, isdeleted: false })
-//         if (!checkBlogId) res.status(404).send({ msg: "Blog Id is not valid" })
-
-//         let deleted = await blogModel.findOneAndUpdate(
-//             { _id: blogId },
-//             { $set: { isdeleted: true, deletedAt: Date.now() } }
-//         )
-//         res.status(200).end()
-//     } catch (e) { res.status(500).send(e.message) }
-// }
+const DeleteStatus = async function (req, res) {
+    try {
+        let data = req.query
+        data.isdeleted=false
+        let deleted = await blogModel.findOneAndUpdate(
+            data,
+            { $set: { isdeleted: true, deletedAt: Date.now() } },
+            {new:true}
+        )
+        if(!deleted) return res.status(404).send({msg:"blog not valid"})
+        res.status(200).send(deleted)
+    } catch (e) { res.status(500).send(e.message) }
+}
 
 
 module.exports.createAuthor = createAuthor
@@ -112,4 +112,4 @@ module.exports.createBlog = createBlog
 module.exports.getBlog = getBlog
 module.exports.putBlog = putBlog
 module.exports.checkDeleteStatus = checkDeleteStatus
-// module.exports.DeleteStatus = DeleteStatus
+module.exports.DeleteStatus = DeleteStatus
