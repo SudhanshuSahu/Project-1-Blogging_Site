@@ -1,13 +1,17 @@
 const blogModel = require("../Model/blogModel");
 const authorModel = require("../Model/authorModel");
 
+let regex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
+
 const createAuthor = async function (req, res) {
     try {
         let data = req.body
-        if (Object.keys(data).length === 0) res.send({ msg: "data for updation must be given" })
+        if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
+        let checkmail = regex.test(data.email)
+        if(checkmail==false) res.status(400).send("email not valid")
         let emailidexist = await authorModel.findOne({ email: data.email })
         if (emailidexist) {
-            return res.status(400).send({ status: false, meg: "email alredy exist" })
+            return res.status(400).send({ status: false, msg: "email alredy exist" })
         }
 
         let author_data = await authorModel.create(data)
@@ -18,10 +22,12 @@ const createAuthor = async function (req, res) {
     }
 }
 
+
+
 const createBlog = async function (req, res) {
     try{
     let data = req.body
-    if (Object.keys(data).length === 0) res.send({ msg: "data for updation must be given" })
+    if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
     if(data.hasOwnProperty('ispublished'))
     {
         if (data.ispublished == true) {
@@ -60,7 +66,7 @@ const putBlog = async function (req, res) {
         let checkId = await blogModel.findOne({ _id: blogid, isdeleted: false })
         if (!checkId) res.status(404).send({ msg: "blog id not exist" })
         let data = req.body
-        if (Object.keys(data).length === 0) res.send({ msg: "data for updation must be given" })
+        if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
         if (data.hasOwnProperty('ispublished')) {
             if (data.ispublished == true) {
                 data.publishedAt = Date.now()
