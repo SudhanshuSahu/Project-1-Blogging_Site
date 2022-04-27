@@ -1,29 +1,25 @@
 const mongoose = require('mongoose');
-const validator = require('validator'); 
+
 const authorSchema = new mongoose.Schema({
-    firstName: {
+    fname: {
         type: String,
         required: true
     },
-    income: {
+    lname: {
         type: String,
         required: true
     },
     title: {
         type: String,
         required: true,
-        enum: ["Ms", "Mrs", "Miss"]
+        enum: ["Mr", "Mrs", "Miss"]
     },
-    emailid: {
+    email: {
         type: String,
         required: true,
         unique: true,
         lowercase: true,
-        validate: {
-            validator: function (emailid) {
-                return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailid)
-            }, message: 'Please fill a valid email address', isAsync: false
-        }
+        validate: [ isEmail, 'invalid email' ]
 
     },
     password: {
