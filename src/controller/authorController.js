@@ -1,6 +1,5 @@
 const authorModel = require("../Model/authorModel");
 
-
 const createAuthor= async function (req, res) {
     let data = req.body
     let emailidexist = await authorModel.findOne({email:email})
