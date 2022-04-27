@@ -14,7 +14,6 @@ const createBlog = async function (req, res) {
         return res.status(201).send({ status: true, data: blogUpdated })
     }
     return res.status(201).send({ status: true, data: createBlogData })
-
 }
 
 module.exports.createBlog = createBlog
