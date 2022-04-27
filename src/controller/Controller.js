@@ -35,7 +35,7 @@ const createBlog = async function (req, res) {
         }
     }
     let authorId = data.authorId
-    let checkAuthorId = await authorModel.find({ _id: authorId })
+    let checkAuthorId = await authorModel.findOne({ _id: authorId })
     if (!checkAuthorId) {
         res.status(400).send({ status: false, msg: "Enter valid Author Id" })
     }
@@ -52,7 +52,7 @@ const getBlog = async function (req, res) {
         filter.isdeleted = false
         filter.ispublished = true
         let blog = await blogModel.find(filter).populate("authorId")
-        if (blog.length == 0) res.status(404).send({ msg: "no data found" })
+        if (blog.length == 0) return res.status(404).send({ msg: "no data found" })
         res.status(200).send({ data: blog })
     } catch (e) {
         res.status(500).send(e.message)
@@ -64,9 +64,9 @@ const putBlog = async function (req, res) {
     try {
         let blogid = req.params.blogid
         let checkId = await blogModel.findOne({ _id: blogid, isdeleted: false })
-        if (!checkId) res.status(404).send({ msg: "blog id not exist" })
+        if (!checkId) return res.status(404).send({ msg: "blog id not exist" })
         let data = req.body
-        if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
+        if (Object.keys(data).length === 0) return res.status(400).send({ msg: "data for updation must be given" })
         if (data.hasOwnProperty('ispublished')) {
             if (data.ispublished == true) {
                 data.publishedAt = Date.now()
@@ -88,7 +88,7 @@ const checkDeleteStatus = async function (req, res) {
     try {
         let blogId = req.params.blogId
         let checkBlogId = await blogModel.find({ _id: blogId, isdeleted: false })
-        if (!checkBlogId) res.status(404).send({ msg: "Blog Id is not valid" })
+        if (!checkBlogId) return res.status(404).send({ msg: "Blog Id is not valid" })
 
         let deleted = await blogModel.findOneAndUpdate(
             { _id: blogId },
