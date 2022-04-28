@@ -1,12 +1,12 @@
 const blogModel = require("../Model/blogModel");
 const authorModel = require("../Model/authorModel");
-
+const jwt = require("jsonwebtoken")
 let regex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
 
 const createAuthor = async function (req, res) {
     try {
         let data = req.body
-        if (Object.keys(data).length === 0) return res.status(400).send({ msg: "data for updation must be given" })
+        if (Object.keys(data).length === 0) return res.status(400).send({ msg: "data must be given" })
         let checkmail = regex.test(data.email)
         if (checkmail == false) return res.status(400).send("email not valid")
         let emailidexist = await authorModel.findOne({ email: data.email })
@@ -22,12 +22,36 @@ const createAuthor = async function (req, res) {
     }
 }
 
+const logIn = async function (req, res) {
+    try{
+    let data = req.body
+    if (Object.keys(data).length === 0) return res.status(400).send({ msg: "data must be given" })
+    let email = req.body.email
+    let password = req.body.password
+    if(!email || !password)
+    return res.status(400).send({msg:"Email and password must be present"})
+
+    let author = await authorModel.findOne({email:email ,password:password})
+    if(!author) return res.status(400).send({msg : "Email or Password in not matched "})
+
+    let token = jwt.sign({authorId : author._id.toString()},'project-1')
+     
+    res.setHeader("x-api-key" , token)
+    res.send(token)
+}
+catch(err){
+res.status(500).send({msg:err.message})
+}
+
+
+}
+
 
 
 const createBlog = async function (req, res) {
     try {
         let data = req.body
-        if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
+        if (Object.keys(data).length === 0) res.status(400).send({ msg: "data must be given" })
         if (data.hasOwnProperty('ispublished')) {
             if (data.ispublished == true) {
                 data.publishedAt = Date.now()
@@ -119,3 +143,4 @@ module.exports.getBlog = getBlog
 module.exports.putBlog = putBlog
 module.exports.checkDeleteStatus = checkDeleteStatus
 module.exports.DeleteStatus = DeleteStatus
+module.exports.logIn = logIn

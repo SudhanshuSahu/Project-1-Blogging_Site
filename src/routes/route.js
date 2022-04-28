@@ -3,6 +3,8 @@ const router = express.Router();
 const Controller = require("../controller/Controller")
 
 router.post("/authors", Controller.createAuthor)
+router.post("/authorLogin", Controller.logIn)
+
 router.post("/blogs",Controller.createBlog )
 router.get("/blogs",Controller.getBlog)
 router.put("/blogs/:blogid",Controller.putBlog)
