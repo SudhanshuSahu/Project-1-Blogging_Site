@@ -6,9 +6,9 @@ let regex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
 const createAuthor = async function (req, res) {
     try {
         let data = req.body
-        if (Object.keys(data).length === 0) res.status(400).send({ msg: "data for updation must be given" })
+        if (Object.keys(data).length === 0) return res.status(400).send({ msg: "data for updation must be given" })
         let checkmail = regex.test(data.email)
-        if (checkmail == false) res.status(400).send("email not valid")
+        if (checkmail == false) return res.status(400).send("email not valid")
         let emailidexist = await authorModel.findOne({ email: data.email })
         if (emailidexist) {
             return res.status(400).send({ status: false, msg: "email alredy exist" })
@@ -113,8 +113,6 @@ const DeleteStatus = async function (req, res) {
 
     } catch (e) { res.status(500).send(e.message) }
 }
-
-
 module.exports.createAuthor = createAuthor
 module.exports.createBlog = createBlog
 module.exports.getBlog = getBlog
