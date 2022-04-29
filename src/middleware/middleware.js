@@ -26,7 +26,7 @@ let authrize = async function(req,res,next)
         let token = req['x-api-key'];
         var decoded = jwt.decode(token)
         let authorid = decoded.authorId
-        let blogs = await blogModel.find({ authorId : authorid }).select({_id:1})
+        let blogs = await blogModel.find({ authorId : authorid , isdeleted:false }).select({_id:1})
         for(let i=0; i<blogs.length; i++)
         {
             if(req.params.blogid == blogs[i]._id)
@@ -48,26 +48,28 @@ let authrize2 = async function(req,res,next)
         let token = req['x-api-key'];
         var decoded = jwt.decode(token)
         let authorid = decoded.authorId
-        let blogs = await blogModel.find({ authorId : authorid })
+        let blogs = await blogModel.find({ authorId : authorid , isdeleted:false })
 
             let data=req.query
             let key = Object.keys(data)
             let c =0
-            for(let j=0; j<key.length; j++) 
+            for(let i=0; i<blogs.length; i++) 
             {
-                let x = key[j]
-                for(let i=0; i<blogs.length; i++)
+                for(let j=0; j<key.length; j++)
                 {
+                    let x = key[j]
                     if(data[x] == blogs[i][x])
                     {
                         c++
                     }
                 }
+                if(key.length == c)
+                {
+                    return res.send("done")
+                }
+                c=0
             }
-            if(key.length == c)
-            {
-                next()
-            }
+            
         return res.status(403).send({msg:"unauthrized user"})
         
     }

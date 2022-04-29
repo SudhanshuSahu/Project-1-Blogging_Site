@@ -99,8 +99,12 @@ const checkDeleteStatus = async function (req, res) {
 
 const DeleteStatus = async function (req, res) {
     try {
+        let token = req['x-api-key'];
+        var decoded = jwt.decode(token)
+        let authorid = decoded.authorId
         let data = req.query
-        let checkDeletedTrue = await blogModel.findOne(data)
+        data.authorid = authorid
+        let checkDeletedTrue = await blogModel.find(data)
         if (checkDeletedTrue.isdeleted == true) return res.status(400).send({ msg: "Document is Already Deleted" })
         let deleted = await blogModel.findOneAndUpdate(
             data,
