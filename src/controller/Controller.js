@@ -22,31 +22,6 @@ const createAuthor = async function (req, res) {
     }
 }
 
-const logIn = async function (req, res) {
-    try{
-    let data = req.body
-    if (Object.keys(data).length === 0) return res.status(400).send({ msg: "data must be given" })
-    let email = req.body.email
-    let password = req.body.password
-    if(!email || !password)
-    return res.status(400).send({msg:"Email and password must be present"})
-
-    let author = await authorModel.findOne({email:email ,password:password})
-    if(!author) return res.status(400).send({msg : "Email or Password in not matched "})
-
-    let token = jwt.sign({authorId : author._id.toString()},'project-1')
-     
-    res.setHeader("x-api-key" , token)
-    res.send(token)
-}
-catch(err){
-res.status(500).send({msg:err.message})
-}
-
-
-}
-
-
 
 const createBlog = async function (req, res) {
     try {
@@ -137,6 +112,27 @@ const DeleteStatus = async function (req, res) {
 
     } catch (e) { res.status(500).send(e.message) }
 }
+
+const logIn = async function (req, res) {
+    try{
+    let data = req.body
+    if (Object.keys(data).length === 0) return res.status(400).send({ msg: "data must be given" })
+    let email = req.body.email
+    let password = req.body.password
+    if(!email || !password)
+    return res.status(400).send({msg:"Email and password must be present"})
+
+    let author = await authorModel.findOne({email:email ,password:password})
+    if(!author) return res.status(400).send({msg : "Email or Password not matched "})
+
+    let token = jwt.sign({authorId : author._id.toString()},'project-1')
+    res.status(201).send({token:token})
+}
+catch(err){
+res.status(500).send({msg:err.message})
+}
+}
+
 module.exports.createAuthor = createAuthor
 module.exports.createBlog = createBlog
 module.exports.getBlog = getBlog
