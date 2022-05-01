@@ -14,7 +14,7 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({ status:false , msg: "email alredy exist" })
         }
         let author_data = await authorModel.create(data)
-        res.send({ status:true,msg:"author created successfully", data: author_data })
+        res.status(201).send({ status:true,msg:"author created successfully", data: author_data })
     }
     catch (e) {
         res.status(500).send({status:false , msg:e.message})
@@ -33,10 +33,10 @@ const createBlog = async function (req, res) {
         let authorId = data.authorId
         let checkAuthorId = await authorModel.findOne({ _id: authorId })
         if (!checkAuthorId) {
-            res.status(400).send({ status:false, msg: "enter valid author id" })
+            return res.status(400).send({ status:false, msg: "enter valid author id" })
         }
         let createBlogData = await blogModel.create(data)
-        res.status(201).send({ status: true,msg:"blog created successfully", data: createBlogData })
+        return res.status(201).send({ status: true,msg:"blog created successfully", data: createBlogData })
     } catch (e) {
         res.status(500).send({status:false , msg:e.message})
     }
@@ -52,13 +52,13 @@ const getBlog = async function (req, res) {
         {
             let checkAuthorId = await authorModel.findOne({ _id: filter.authorId })
             if (!checkAuthorId) {
-                res.status(400).send({ status:false, msg: "enter valid author id" })
+               return res.status(400).send({ status:false, msg: "enter valid author id" })
             }
         }
 
         let blog = await blogModel.find(filter).populate("authorId")
         if (blog.length == 0) return res.status(404).send({ status:false , msg: "no data found" })
-        res.status(200).send({status:true, data: blog })
+         res.status(200).send({status:true, data: blog })
     } catch (e) {
         res.status(500).send({status:false , msg:e.message})
     }
