@@ -17,7 +17,7 @@ const createAuthor = async function (req, res) {
         res.send({ status:true,msg:"author created successfully", data: author_data })
     }
     catch (e) {
-        res.status(500).send(e.message)
+        res.status(500).send({status:false , msg:e.message})
     }
 }
 
@@ -38,7 +38,7 @@ const createBlog = async function (req, res) {
         let createBlogData = await blogModel.create(data)
         res.status(201).send({ status: true,msg:"blog created successfully", data: createBlogData })
     } catch (e) {
-        res.status(500).send(e.message)
+        res.status(500).send({status:false , msg:e.message})
     }
 }
 
@@ -60,7 +60,7 @@ const getBlog = async function (req, res) {
         if (blog.length == 0) return res.status(404).send({ status:false , msg: "no data found" })
         res.status(200).send({status:true, data: blog })
     } catch (e) {
-        res.status(500).send(e.message)
+        res.status(500).send({status:false , msg:e.message})
     }
 }
 
@@ -78,6 +78,7 @@ const putBlog = async function (req, res) {
                 data.publishedAt = Date.now()
             }
         }
+
        if(data.hasOwnProperty('isdeleted'))
        {
            if(data.isdeleted == true)
@@ -85,6 +86,7 @@ const putBlog = async function (req, res) {
             res.status(400).send({status:false , msg: "we can not set delete true from here" })
            }
        }
+
        if(data.hasOwnProperty('authorId'))
        {
          return res.status(400).send({status:false , msg: "author id is not to be update"})
@@ -98,7 +100,7 @@ const putBlog = async function (req, res) {
         res.status(200).send({ status:true,msg:"data successfully updated", data: blog })
     }
     catch (e) {
-        res.status(500).send(e.message)
+        res.status(500).send({status:false , msg:e.message})
     }
 }
 
@@ -111,7 +113,9 @@ const checkDeleteStatus = async function (req, res) {
         )
         if (!deleted) return res.status(400).send({ status :false , msg: "blog id not valid for deletation" })
         res.status(200).end()
-    } catch (e) { res.status(500).send(e.message) }
+    } catch (e) { 
+        res.status(500).send({status:false , msg:e.message})
+     }
 }
 
 const DeleteStatus = async function (req, res) {
@@ -129,7 +133,7 @@ const DeleteStatus = async function (req, res) {
             { new: true }
         )
         if (!deleted) return res.status(404).send({ status :false , msg: "blog id not exist in record" })
-        res.status(200).send({ data: deleted })
+        res.status(200).send({ status:true , data: deleted })
 
     } catch (e) { res.status(500).send(e.message) }
 }
@@ -150,7 +154,7 @@ const logIn = async function (req, res) {
     res.status(201).send({status:true , data:token})
 }
 catch(err){
-res.status(500).send({msg:err.message})
+res.status(500).send({status:false , msg:e.message})
 }
 }
 

@@ -59,6 +59,7 @@ let authrize2 = async function(req,res,next)
         let authorid = decoded.authorId
         let blogs = await blogModel.find({ authorId : authorid , isdeleted:false })
         let data=req.query
+        if (Object.keys(data).length === 0) return res.status(400).send({ status:false, msg: "query must be given" })
         let key = Object.keys(data)
         let c =0
             for(let i=0; i<blogs.length; i++) 
@@ -72,7 +73,7 @@ let authrize2 = async function(req,res,next)
                         let a= data[x]
                         if(arr.indexOf(a))
                         {
-                            c++
+                           c++
                         }
                         else{
                             continue
