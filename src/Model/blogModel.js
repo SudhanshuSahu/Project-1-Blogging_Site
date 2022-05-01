@@ -15,11 +15,12 @@ const blogSchema = new mongoose.Schema({
         ref: "Author",
         required: true,
     },
-    tags: [{ type: String }],
+    subcategory: [{ type: String }],
     category: {
         type: String,
         required: true
     },
+    tags: [{ type: String }],
     isdeleted: {
         type: Boolean,
         default: false
@@ -29,7 +30,6 @@ const blogSchema = new mongoose.Schema({
         default: false
     },
     deletedAt:Date,
-
     publishedAt:Date
 }, { timestamps: true })
 
