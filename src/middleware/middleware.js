@@ -35,13 +35,12 @@ let authrize = async function(req,res,next)
         let token = req['x-api-key'];
         var decoded = await jwt.decode(token)
         let authorid = decoded.authorId
-        let blogs = await blogModel.find({ authorId : authorid , isdeleted:false }).select({_id:1})
-        for(let i=0; i<blogs.length; i++)
+
+        let bid = req.params.blogid
+        blogsAuthor = await blogModel.findOne({ _id : bid , isdeleted:false }).select({authorId:1 ,  _id:0})
+        if(blogsAuthor.authorId == authorid)
         {
-            if(req.params.blogid == blogs[i]._id)
-            {
-               return next()
-            }
+            return next()
         }
         return res.status(403).send({msg:"unauthrized user"})
         
@@ -57,42 +56,14 @@ let authrize2 = async function(req,res,next)
         let token = req['x-api-key'];
         var decoded = await jwt.decode(token)
         let authorid = decoded.authorId
-        let blogs = await blogModel.find({ authorId : authorid , isdeleted:false })
-        let data=req.query
-        if (Object.keys(data).length === 0) return res.status(400).send({ status:false, msg: "query must be given" })
-        let key = Object.keys(data)
-        let c =0
-            for(let i=0; i<blogs.length; i++) 
-            {
-                for(let j=0; j<key.length; j++)
-                {
-                    let x = key[j]
-                    if(x == "tags" || x=="subcategory")
-                    {
-                        let arr = blogs[i][x]
-                        let a= data[x]
-                        if(arr.indexOf(a))
-                        {
-                           c++
-                        }
-                        else{
-                            continue
-                        }
-                    }
-                    if(data[x] == blogs[i][x])
-                    {
-                        c++
-                    }
-                }
-                if(key.length == c)
-                {
-                    return next()
-                }
-                c=0
-            }
-            
-        return res.status(403).send({msg:"unauthrized user"})
-        
+
+        let filter=req.query
+        if (Object.keys(filter).length === 0) return res.status(400).send({ status:false, msg: "query must be given" })
+        filter.authorId = authorid
+        filter.isdeleted = false
+        let blogs = await blogModel.findOne(filter)
+        if(!blogs)  return res.status(403).send({msg:"unauthrized user"})
+         next() 
     }
     catch(e){
         res.status(500).send({status:false , msg:e.message})
