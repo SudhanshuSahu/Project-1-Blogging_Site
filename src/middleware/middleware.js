@@ -37,7 +37,7 @@ let authrize = async function(req,res,next)
         let authorid = decoded.authorId
 
         let bid = req.params.blogid
-        blogsAuthor = await blogModel.findOne({ _id : bid , isdeleted:false }).select({authorId:1 ,  _id:0})
+        blogsAuthor = await blogModel.findOne({ _id : bid }).select({authorId:1 ,  _id:0})
         if(blogsAuthor.authorId == authorid)
         {
             return next()
@@ -60,7 +60,7 @@ let authrize2 = async function(req,res,next)
         let filter=req.query
         if (Object.keys(filter).length === 0) return res.status(400).send({ status:false, msg: "query must be given" })
         filter.authorId = authorid
-        filter.isdeleted = false
+        //filter.isdeleted 
         let blogs = await blogModel.findOne(filter)
         if(!blogs)  return res.status(403).send({msg:"unauthrized user"})
          next() 

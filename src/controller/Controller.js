@@ -3,10 +3,17 @@ const authorModel = require("../Model/authorModel");
 const jwt = require("jsonwebtoken")
 let regex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
 
+
 const createAuthor = async function (req, res) {
     try {
         let data = req.body
         if (Object.keys(data).length === 0) return res.status(400).send({ status:false, msg: "data must be given" })
+        if(!data.fname) return res.status(400).send({status:false , msg:"First Name is required"})
+        if(!data.lname) return res.status(400).send({status:false , msg:"Last Name is required"})
+         if(!data.title) return res.status(400).send({status:false , msg:"title  is required"})
+
+        if(!data.email) return res.status(400).send({status:false , msg:"EMail is required"})
+        if(!data.password) return res.status(400).send({status:false , msg:"password is required"})
         let checkmail = regex.test(data.email)
         if (checkmail == false) return res.status(400).send({status:false,msg:"email not valid"})
         let emailidexist = await authorModel.findOne({ email: data.email })
@@ -107,11 +114,15 @@ const putBlog = async function (req, res) {
 const checkDeleteStatus = async function (req, res) {
     try {
         let blogid = req.params.blogid
-        let deleted = await blogModel.findOneAndUpdate(
-            { _id: blogid , isdeleted:false},
+       
+         let deleted = await blogModel.findOneAndUpdate(
+            { _id: blogid },
             { $set: { isdeleted: true, deletedAt: Date.now() } }
         )
         if (!deleted) return res.status(400).send({ status :false , msg: "blog id not valid for deletation" })
+
+        if(deleted.isdeleted == true) return res.status(400).send({status:false , msg:"Document is already deleted "})
+      
         res.status(200).end()
     } catch (e) { 
         res.status(500).send({status:false , msg:e.message})
@@ -126,14 +137,21 @@ const DeleteStatus = async function (req, res) {
         let authorid = decoded.authorId
         let data = req.query
         data.authorId = authorid
-
+         let checkDelete = data.authorId  
+        let checkDeleteTrue = await blogModel.findOne({authorId:checkDelete})
+        if(checkDeleteTrue.isdeleted== true){
+        return res.status(404).send({ status :false , msg: "document is already deleted" })
+        }
         let deleted = await blogModel.findOneAndUpdate(
             data,
             { $set: { isdeleted: true, deletedAt: Date.now() } },
             { new: true }
         )
         if (!deleted) return res.status(404).send({ status :false , msg: "blog id not exist in record" })
-        res.status(200).send({ status:true , data: deleted })
+        
+         res.status(200).send({ status:true , data: deleted })
+    
+
 
     } catch (e) { res.status(500).send(e.message) }
 }
